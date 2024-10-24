@@ -14,11 +14,6 @@ public class Start extends ScreenAdapter {
     private Texture image;
     private ShapeRenderer shapeRenderer;
     private float timedone;
-    private Levels levels;  // Shared Levels object
-
-    public Start(Levels levels) {
-        this.levels = levels;  // Initialize with the shared Levels instance
-    }
 
     @Override
     public void show() {
@@ -43,7 +38,7 @@ public class Start extends ScreenAdapter {
 
         if (timedone >= 2.0f) {
             // Transition to the MenuScreen after 2 seconds
-            ((Game) Gdx.app.getApplicationListener()).setScreen(new MenuScreen(levels));
+            ((Game) Gdx.app.getApplicationListener()).setScreen(new MenuScreen());
         }
     }
 

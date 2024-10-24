@@ -114,7 +114,7 @@ public class NewGameScreen extends ScreenAdapter {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 try {
-                    ((Game) Gdx.app.getApplicationListener()).setScreen(new MenuScreen(levels));
+                    ((Game) Gdx.app.getApplicationListener()).setScreen(new MenuScreen());
                 } catch (Exception e) {
                     System.err.println("[Error] Failed to transition to MenuScreen: " + e.getMessage());
                 }

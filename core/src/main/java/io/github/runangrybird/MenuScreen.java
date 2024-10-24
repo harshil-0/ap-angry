@@ -18,11 +18,7 @@ public class MenuScreen extends ScreenAdapter {
     private SpriteBatch batch;
     private Texture backgroundTexture;
     private ImageButton newGameButton, continueGameButton, exitButton;
-    private Levels levels;  // Shared Levels object
-
-    public MenuScreen(Levels levels) {
-        this.levels = levels;  // Initialize with the shared Levels instance
-    }
+    private Levels level;
 
     @Override
     public void show() {
@@ -44,7 +40,7 @@ public class MenuScreen extends ScreenAdapter {
             public void clicked(InputEvent event, float x, float y) {
                 try {
                     // Transition to the NewGameScreen
-                    ((Game) Gdx.app.getApplicationListener()).setScreen(new NewGameScreen(levels));
+                    ((Game) Gdx.app.getApplicationListener()).setScreen(new NewGameScreen(level));
                 } catch (Exception e) {
                     // Handle exceptions and print error message
                     Gdx.app.log("Error", "An error occurred while transitioning to NewGameScreen: " + e.getMessage());

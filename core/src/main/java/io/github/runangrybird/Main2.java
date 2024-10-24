@@ -10,15 +10,14 @@ public class Main2 extends Game {
     SpriteBatch batch;
     ShapeRenderer shapeRenderer;
     BitmapFont font;
-    private Levels levels;  // Shared Levels object
-    
+
 
     @Override
     public void create() {
         batch = new SpriteBatch();
         shapeRenderer = new ShapeRenderer();
         font = new BitmapFont();
-        setScreen(new Start(levels));  // Transition to Start screen on creation
+        setScreen(new Start());  // Transition to Start screen on creation
     }
 
     @Override

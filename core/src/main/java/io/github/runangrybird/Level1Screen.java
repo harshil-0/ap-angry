@@ -225,5 +225,21 @@ public class Level1Screen extends ScreenAdapter {
         pauseScreen = new PauseScreen(stage, skin);
     }
 
-    // Render and hide methods remain unchanged
+    @Override
+        public void render(float delta) {
+            ScreenUtils.clear(0.15f, 0.15f, 0.2f, 1f);
+            batch.begin();
+            batch.draw(background, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+            batch.end();
+            stage.act(Math.min(Gdx.graphics.getDeltaTime(), 1 / 30f));
+            stage.draw();
+        }
+
+        @Override
+        public void hide() {
+            batch.dispose();
+            background.dispose();
+            stage.dispose();
+            skin.dispose();
+        }
 }
