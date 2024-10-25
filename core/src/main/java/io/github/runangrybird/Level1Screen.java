@@ -200,6 +200,8 @@ public class Level1Screen extends ScreenAdapter {
     private Skin skin;
     private Levels levels;
     private PauseScreen pauseScreen;
+    private WinScreen winScreen;
+    private LoseScreen loseScreen;
 
     // Textures for birds and pigs
     private Texture birdTexture;
@@ -208,6 +210,9 @@ public class Level1Screen extends ScreenAdapter {
     // Arrays to store multiple birds and pigs
     private Array<Sprite> birds;
     private Array<Sprite> pigs;
+
+    private Texture woodTexture;
+    private Array<Sprite> woods;
 
     public Level1Screen(Levels levels) {
         this.levels = levels;  // Initialize with the shared Levels instance
@@ -224,10 +229,13 @@ public class Level1Screen extends ScreenAdapter {
         // Load bird and pig textures
         birdTexture = new Texture(Gdx.files.internal("ab3.png"));
         pigTexture = new Texture(Gdx.files.internal("pig1.png"));
+        woodTexture = new Texture(Gdx.files.internal("sqwood.png"));
+
 
         // Create arrays for bird and pig sprites
         birds = new Array<>();
         pigs = new Array<>();
+        woods = new Array<>();
 
         // Initialize birds at specific coordinates
         Sprite bird1 = new Sprite(birdTexture);
@@ -247,19 +255,34 @@ public class Level1Screen extends ScreenAdapter {
 
         // Initialize pigs at specific coordinates
         Sprite pig1 = new Sprite(pigTexture);
-        pig1.setPosition(1000, 10);  // First pig's position
+        pig1.setPosition(980, 100);  // First pig's position
         pig1.setScale(0.2f);
         pigs.add(pig1);
 
         Sprite pig2 = new Sprite(pigTexture);
-        pig2.setPosition(1100, 10);  // Second pig's position
+        pig2.setPosition(1080, 100);  // Second pig's position
         pig2.setScale(0.2f);
         pigs.add(pig2);
 
         Sprite pig3 = new Sprite(pigTexture);
-        pig3.setPosition(1200, 10);  // Third pig's position
+        pig3.setPosition(1180, 100);  // Third pig's position
         pig3.setScale(0.2f);
         pigs.add(pig3);
+
+        Sprite wood1 = new Sprite(woodTexture);
+        wood1.setPosition(1200, 200);  // Position for first wood piece
+        wood1.setScale(1.3f);
+        woods.add(wood1);
+
+        Sprite wood2 = new Sprite(woodTexture);
+        wood2.setPosition(1300, 200);  // Position for second wood piece
+        wood2.setScale(1.3f);
+        woods.add(wood2);
+
+        Sprite wood3 = new Sprite(woodTexture);
+        wood3.setPosition(1400, 200);  // Position for third wood piece
+        wood3.setScale(1.3f);
+        woods.add(wood3);
 
         // Load the pause button texture and create the button
         Texture pauseTexture = new Texture(Gdx.files.internal("pause.png"));
@@ -274,20 +297,45 @@ public class Level1Screen extends ScreenAdapter {
         stage.addActor(pauseButton);
 
         // Add a button to unlock the next level (e.g., Level 2)
-        Texture unlockTexture = new Texture(Gdx.files.internal("resume.png"));
+        Texture unlockTexture = new Texture(Gdx.files.internal("winbutton.png"));
         ImageButton unlockButton = new ImageButton(new TextureRegionDrawable(new TextureRegion(unlockTexture)));
-        unlockButton.setPosition(Gdx.graphics.getWidth() - 200, 50);
+        unlockButton.setPosition(Gdx.graphics.getWidth() - 200, 30);
         unlockButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 levels.unlockLevel("Level 2"); // Unlock Level 2
                 System.out.println("Level 2 has been unlocked!");
-                ((Game) Gdx.app.getApplicationListener()).setScreen(new NewGameScreen(levels));  // Pass levels object
+//                ((Game) Gdx.app.getApplicationListener()).setScreen(new WinScreen(levels,stage,skin));  // Pass levels object
+                if (pauseScreen.isMusicOn){
+                    pauseScreen.isMusicOn = false;
+                    pauseScreen.backgroundMusic.pause();
+                }
+                winScreen.show();
             }
         });
         stage.addActor(unlockButton);
 
+        Texture Lose = new Texture(Gdx.files.internal("losebutton.png"));
+        ImageButton LoseButton = new ImageButton(new TextureRegionDrawable(new TextureRegion(Lose)));
+        LoseButton.setPosition(Gdx.graphics.getWidth() - 300, 30);
+        LoseButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+//                levels.unlockLevel("Level 2"); // Unlock Level 2
+//                System.out.println("Level 2 has been unlocked!");
+//                ((Game) Gdx.app.getApplicationListener()).setScreen(new WinScreen(levels,stage,skin));  // Pass levels object
+                if (pauseScreen.isMusicOn){
+                    pauseScreen.isMusicOn = false;
+                    pauseScreen.backgroundMusic.pause();
+                }
+                loseScreen.show();
+            }
+        });
+        stage.addActor(LoseButton);
+
         pauseScreen = new PauseScreen(stage, skin);
+        winScreen = new WinScreen(levels,stage,skin);
+        loseScreen = new LoseScreen(levels,stage,skin);
     }
 
     @Override
@@ -309,6 +357,8 @@ public class Level1Screen extends ScreenAdapter {
             pig.draw(batch);
         }
 
+        for (Sprite wood : woods) wood.draw(batch);
+
         // End the sprite batch
         batch.end();
 
@@ -325,8 +375,11 @@ public class Level1Screen extends ScreenAdapter {
         skin.dispose();
         birdTexture.dispose();
         pigTexture.dispose();
+        woodTexture.dispose();
         if (pauseScreen != null) {
             pauseScreen.dispose();  // Dispose of PauseScreen resources
+         if (winScreen != null) {
+             winScreen.dispose();}
         }
     }
 }

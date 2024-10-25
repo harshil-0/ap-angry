@@ -162,8 +162,8 @@ public class PauseScreen {
     private Skin skin;  // Skin for button styling
     private Dialog pauseDialog;
     private Levels levels;  // Shared Levels object
-    private Music backgroundMusic;  // For controlling the music
-    private boolean isMusicOn = true;
+    public Music backgroundMusic;  // For controlling the music
+    public boolean isMusicOn = true;
 
     public PauseScreen(Levels levels) {
         this.levels = levels;  // Initialize with the shared Levels instance
