@@ -143,6 +143,7 @@ package io.github.runangrybird;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
@@ -161,6 +162,8 @@ public class PauseScreen {
     private Skin skin;  // Skin for button styling
     private Dialog pauseDialog;
     private Levels levels;  // Shared Levels object
+    private Music backgroundMusic;  // For controlling the music
+    private boolean isMusicOn = true;
 
     public PauseScreen(Levels levels) {
         this.levels = levels;  // Initialize with the shared Levels instance
@@ -169,11 +172,19 @@ public class PauseScreen {
     public PauseScreen(Stage stage, Skin skin) {
         this.stage = stage;
         this.skin = skin;
+        // Load the music file here (using a hardcoded path for now)
+        try {
+            this.backgroundMusic = Gdx.audio.newMusic(Gdx.files.internal("audio_episode_intro.mp3"));
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("Error loading music: " + e.getMessage());
+        }
+        this.backgroundMusic.setLooping(true);  // Loop the music
+        this.backgroundMusic.play();  // Start playing the music
         createPauseDialog();
     }
 
     private void createPauseDialog() {
-        // Create the dialog
         pauseDialog = new Dialog("Pause Menu", skin);
         pauseDialog.setModal(true);
         pauseDialog.setMovable(false);
@@ -185,6 +196,8 @@ public class PauseScreen {
         Texture resumeTexture = new Texture(Gdx.files.internal("resume.png"));
         Texture restartTexture = new Texture(Gdx.files.internal("restart.png"));
         Texture returnTexture = new Texture(Gdx.files.internal("returnlevels.png"));
+        Texture musicOnTexture = new Texture(Gdx.files.internal("music_off.png"));
+        Texture musicOffTexture = new Texture(Gdx.files.internal("music_on.png"));
 
         // Resume button
         TextureRegion resumeRegion = new TextureRegion(resumeTexture);
@@ -223,10 +236,37 @@ public class PauseScreen {
             }
         });
         table.add(returnButton).padBottom(20).fillX().height(60).row();
+
+        // Music toggle button
+        TextureRegion musicOnRegion = new TextureRegion(musicOnTexture);
+        TextureRegion musicOffRegion = new TextureRegion(musicOffTexture);
+        Drawable musicOnDrawable = new TextureRegionDrawable(musicOnRegion);
+        Drawable musicOffDrawable = new TextureRegionDrawable(musicOffRegion);
+
+        final ImageButton musicButton = new ImageButton(musicOnDrawable);
+        musicButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                if (isMusicOn) {
+                    backgroundMusic.pause();  // Pause the music
+                    musicButton.getStyle().imageUp = musicOffDrawable;  // Switch to 'off' icon
+                } else {
+                    backgroundMusic.play();  // Play the music
+                    musicButton.getStyle().imageUp = musicOnDrawable;  // Switch to 'on' icon
+                }
+                isMusicOn = !isMusicOn;  // Toggle the state
+            }
+        });
+        table.add(musicButton).padBottom(20).fillX().height(60).row();
     }
 
     public void show() {
         pauseDialog.show(stage);  // Display the dialog
     }
+
+    public void dispose() {
+        backgroundMusic.dispose();  // Clean up the music resource
+    }
 }
+
 

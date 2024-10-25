@@ -84,22 +84,22 @@
 //        skin.dispose();
 //    }
 //}
-package io.github.runangrybird;
-
-import com.badlogic.gdx.Game;
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.ScreenAdapter;
-import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
-import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
-import com.badlogic.gdx.utils.ScreenUtils;
-import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
+//package io.github.runangrybird;
+//
+//import com.badlogic.gdx.Game;
+//import com.badlogic.gdx.Gdx;
+//import com.badlogic.gdx.graphics.Texture;
+//import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+//import com.badlogic.gdx.ScreenAdapter;
+//import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
+//import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+//import com.badlogic.gdx.scenes.scene2d.InputEvent;
+//import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
+//import com.badlogic.gdx.utils.ScreenUtils;
+//import com.badlogic.gdx.scenes.scene2d.Stage;
+//import com.badlogic.gdx.graphics.g2d.TextureRegion;
+//import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+//import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 
 //public class Level1Screen extends ScreenAdapter {
 //    private SpriteBatch batch;
@@ -175,6 +175,24 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 //        }
 //    }
 
+package io.github.runangrybird;
+
+import com.badlogic.gdx.Game;
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.ScreenAdapter;
+import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
+import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.ScreenUtils;
+
 public class Level1Screen extends ScreenAdapter {
     private SpriteBatch batch;
     private Texture background;
@@ -182,6 +200,14 @@ public class Level1Screen extends ScreenAdapter {
     private Skin skin;
     private Levels levels;
     private PauseScreen pauseScreen;
+
+    // Textures for birds and pigs
+    private Texture birdTexture;
+    private Texture pigTexture;
+
+    // Arrays to store multiple birds and pigs
+    private Array<Sprite> birds;
+    private Array<Sprite> pigs;
 
     public Level1Screen(Levels levels) {
         this.levels = levels;  // Initialize with the shared Levels instance
@@ -195,10 +221,50 @@ public class Level1Screen extends ScreenAdapter {
         Gdx.input.setInputProcessor(stage);
         skin = new Skin(Gdx.files.internal("uiskin.json"));
 
+        // Load bird and pig textures
+        birdTexture = new Texture(Gdx.files.internal("ab3.png"));
+        pigTexture = new Texture(Gdx.files.internal("pig1.png"));
+
+        // Create arrays for bird and pig sprites
+        birds = new Array<>();
+        pigs = new Array<>();
+
+        // Initialize birds at specific coordinates
+        Sprite bird1 = new Sprite(birdTexture);
+        bird1.setPosition(50, 10);// First bird's position
+        bird1.setScale(0.2f);
+        birds.add(bird1);
+
+        Sprite bird2 = new Sprite(birdTexture);
+        bird2.setPosition(150, 10);  // Second bird's position
+        bird2.setScale(0.2f);
+        birds.add(bird2);
+
+        Sprite bird3 = new Sprite(birdTexture);
+        bird3.setPosition(250, 10);  // Third bird's position
+        bird3.setScale(0.2f);
+        birds.add(bird3);
+
+        // Initialize pigs at specific coordinates
+        Sprite pig1 = new Sprite(pigTexture);
+        pig1.setPosition(1000, 10);  // First pig's position
+        pig1.setScale(0.2f);
+        pigs.add(pig1);
+
+        Sprite pig2 = new Sprite(pigTexture);
+        pig2.setPosition(1100, 10);  // Second pig's position
+        pig2.setScale(0.2f);
+        pigs.add(pig2);
+
+        Sprite pig3 = new Sprite(pigTexture);
+        pig3.setPosition(1200, 10);  // Third pig's position
+        pig3.setScale(0.2f);
+        pigs.add(pig3);
+
         // Load the pause button texture and create the button
         Texture pauseTexture = new Texture(Gdx.files.internal("pause.png"));
         ImageButton pauseButton = new ImageButton(new TextureRegionDrawable(new TextureRegion(pauseTexture)));
-        pauseButton.setPosition(Gdx.graphics.getWidth() - 150, Gdx.graphics.getHeight() - 100);
+        pauseButton.setPosition(Gdx.graphics.getWidth() - 200, Gdx.graphics.getHeight() - 175);
         pauseButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
@@ -210,13 +276,12 @@ public class Level1Screen extends ScreenAdapter {
         // Add a button to unlock the next level (e.g., Level 2)
         Texture unlockTexture = new Texture(Gdx.files.internal("resume.png"));
         ImageButton unlockButton = new ImageButton(new TextureRegionDrawable(new TextureRegion(unlockTexture)));
-        unlockButton.setPosition(Gdx.graphics.getWidth() / 2 - 100, Gdx.graphics.getHeight() / 2 - 100);
+        unlockButton.setPosition(Gdx.graphics.getWidth() - 200, 50);
         unlockButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 levels.unlockLevel("Level 2"); // Unlock Level 2
                 System.out.println("Level 2 has been unlocked!");
-
                 ((Game) Gdx.app.getApplicationListener()).setScreen(new NewGameScreen(levels));  // Pass levels object
             }
         });
@@ -226,20 +291,43 @@ public class Level1Screen extends ScreenAdapter {
     }
 
     @Override
-        public void render(float delta) {
-            ScreenUtils.clear(0.15f, 0.15f, 0.2f, 1f);
-            batch.begin();
-            batch.draw(background, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-            batch.end();
-            stage.act(Math.min(Gdx.graphics.getDeltaTime(), 1 / 30f));
-            stage.draw();
+    public void render(float delta) {
+        ScreenUtils.clear(0.15f, 0.15f, 0.2f, 1f);
+
+        // Begin the sprite batch
+        batch.begin();
+        // Draw the background
+        batch.draw(background, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+
+        // Draw all bird sprites
+        for (Sprite bird : birds) {
+            bird.draw(batch);
         }
 
-        @Override
-        public void hide() {
-            batch.dispose();
-            background.dispose();
-            stage.dispose();
-            skin.dispose();
+        // Draw all pig sprites
+        for (Sprite pig : pigs) {
+            pig.draw(batch);
         }
+
+        // End the sprite batch
+        batch.end();
+
+        // Handle the stage (UI elements)
+        stage.act(Math.min(Gdx.graphics.getDeltaTime(), 1 / 30f));
+        stage.draw();
+    }
+
+    @Override
+    public void hide() {
+        batch.dispose();
+        background.dispose();
+        stage.dispose();
+        skin.dispose();
+        birdTexture.dispose();
+        pigTexture.dispose();
+        if (pauseScreen != null) {
+            pauseScreen.dispose();  // Dispose of PauseScreen resources
+        }
+    }
 }
+
