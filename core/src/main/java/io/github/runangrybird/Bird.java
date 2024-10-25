@@ -1,6 +1,5 @@
 package io.github.runangrybird;
 
-// Bird.java
 public abstract class Bird {
     private String type;
     private float velocity;
