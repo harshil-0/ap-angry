@@ -20,20 +20,28 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ScreenUtils;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Level1Screen extends ScreenAdapter {
     private SpriteBatch batch;
     private Texture background;
     private World world;  // Box2D world
     private Box2DDebugRenderer debugRenderer;  // Optional for debugging physics
     private Levels levels;
-    private Array<Sprite> sprites;  // For visual representation of Box2D bodies
-    private Array<Body> bodies;  // Box2D bodies
+    public static Array<Sprite> sprites = new Array<>();  // For visual representation of Box2D bodies
+    public static Array<Body> bodies = new Array<>();  // Box2D bodies
     private PauseScreen pauseScreen;
     private WinScreen winScreen;
     private LoseScreen loseScreen;
     private Stage stage;
     private Skin skin;
     private Slingshot slingshot;
+    private List<Body> bodiesToRemove = new ArrayList<>();
+    private List<Sprite> spritesToRemove = new ArrayList<>();
+    private Array<Body> pigBodies = new Array<>();
+    public static Array<Body> birdBodies = new Array<>();
+
 
     private Texture birdTexture, pigTexture, woodTexture;
 
@@ -47,7 +55,7 @@ public class Level1Screen extends ScreenAdapter {
         background = new Texture(Gdx.files.internal("level1bg.jpg"));
 
         // Initialize Box2D world with gravity
-        world = new World(new Vector2(0, -100f), true);  // Gravity pointing downward
+        world = new World(new Vector2(0, -10f), true);  // Gravity pointing downward
         debugRenderer = new Box2DDebugRenderer();
 
         stage = new Stage();
@@ -62,8 +70,8 @@ public class Level1Screen extends ScreenAdapter {
         pigTexture = new Texture(Gdx.files.internal("pig1.png"));
         woodTexture = new Texture(Gdx.files.internal("sqwood.png"));
 
-        sprites = new Array<>();
-        bodies = new Array<>();
+//        sprites = new Array<>();
+//        bodies = new Array<>();
 
         // Create ground
         createGround();
@@ -72,12 +80,12 @@ public class Level1Screen extends ScreenAdapter {
 //        createDynamicBody(150, 300, birdTexture, 0.2f);
 
         // Create pigs
-        createDynamicBody(1200, 400, pigTexture, 0.2f);
-        createDynamicBody(1280, 400, pigTexture, 0.2f);
+        createDynamicBody(1200, 400, pigTexture, 0.2f,"pig");
+        createDynamicBody(1300, 400, pigTexture, 0.2f,"pig");
 
         // Create woods
-        createDynamicBody(1200, 300, woodTexture, 1f);
-        createDynamicBody(1300, 300, woodTexture, 1f);
+        createDynamicBody(1200, 300, woodTexture, 1f,"wood");
+        createDynamicBody(1300, 300, woodTexture, 1f,"wood");
 
 //         Load the pause button texture and create the button
         Texture pauseTexture = new Texture(Gdx.files.internal("pause.png"));
@@ -131,6 +139,7 @@ public class Level1Screen extends ScreenAdapter {
         pauseScreen = new PauseScreen(stage, skin);
         winScreen = new WinScreen(levels, stage, skin);
         loseScreen = new LoseScreen(levels, stage, skin);
+        setupCollisionDetection();
 
         stage.addListener(new InputListener() {
             private Vector2 dragStart = new Vector2();
@@ -153,8 +162,8 @@ public class Level1Screen extends ScreenAdapter {
             public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
                 if (isDragging) {
                     dragEnd.set(x, y);
-                    Vector2 force = dragStart.sub(dragEnd).scl(100000000f);
-                    force.y += Math.abs(force.x) * 0.01f;
+                    Vector2 force = dragStart.sub(dragEnd).scl(100000000000000f);
+                    force.y += Math.abs(force.x) ;
                     slingshot.launchBird(force);
                     isDragging = false;
                 }
@@ -168,6 +177,9 @@ public class Level1Screen extends ScreenAdapter {
                 return true;
             }
         });
+
+
+
     }
 
         private void createGround() {
@@ -192,7 +204,7 @@ public class Level1Screen extends ScreenAdapter {
         groundShape.dispose();
     }
 
-    private void createDynamicBody(float x, float y, Texture texture, float scale) {
+    private void createDynamicBody(float x, float y, Texture texture, float scale, String userData) {
         // Define a dynamic body
         BodyDef bodyDef = new BodyDef();
         bodyDef.type = BodyDef.BodyType.DynamicBody;
@@ -200,34 +212,175 @@ public class Level1Screen extends ScreenAdapter {
 
         Body body = world.createBody(bodyDef);
 
-        // Define a circular shape for birds/pigs or a box shape for woods
+        // Define a box shape
         PolygonShape shape = new PolygonShape();
         shape.setAsBox(texture.getWidth() * scale / 2, texture.getHeight() * scale / 2);
 
-        // Create a fixture for the body
+        // Create a fixture
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.shape = shape;
         fixtureDef.density = 1f;
         fixtureDef.friction = 0.5f;
-        fixtureDef.restitution = 0.3f;  // Bounciness
+        fixtureDef.restitution = 0.3f;
 
-        body.createFixture(fixtureDef);
+        Fixture fixture = body.createFixture(fixtureDef);
+        fixture.setUserData(userData); // Set user data (e.g., "bird" or "pig")
+        body.setUserData(userData);
         shape.dispose();
 
-        // Link sprite with body
+        // Add sprite
         Sprite sprite = new Sprite(texture);
         sprite.setSize(texture.getWidth() * scale, texture.getHeight() * scale);
         sprite.setOriginCenter();
         sprites.add(sprite);
         bodies.add(body);
+        if (body.getUserData().equals("pig")){
+            pigBodies.add(body);
+        }
     }
+
+
+    private void setupCollisionDetection() {
+        world.setContactListener(new ContactListener() {
+            @Override
+            public void beginContact(Contact contact) {
+                // Get the two bodies involved in the collision
+                Body bodyA = contact.getFixtureA().getBody();
+                Body bodyB = contact.getFixtureB().getBody();
+                Fixture fixtureA = contact.getFixtureA();
+                Fixture fixtureB = contact.getFixtureB();
+                Object userDataA = fixtureA.getBody().getUserData();
+                Object userDataB = fixtureB.getBody().getUserData();
+                if (userDataA == null || userDataB == null) {
+                    System.out.println("Collision ignored due to null UserData.");
+                    return; // Avoid further processing
+                }
+                System.out.println("UserData A: " + userDataA + ", UserData B: " + userDataB);
+                // Check if one of the bodies is a bird and the other is a pig
+                if ("bird".equals(bodyA.getUserData()) && "pig".equals(bodyB.getUserData())) {
+                    // Handle bird hitting pig
+                    handleBirdHitsPig(bodyB);  // Swap order to ensure correct removal
+                } else if ("pig".equals(bodyA.getUserData()) && "bird".equals(bodyB.getUserData())) {
+                    // Handle pig hitting bird
+                    handleBirdHitsPig(bodyA);  // Swap order to ensure correct removal
+                }
+            }
+
+            @Override
+            public void endContact(Contact contact) {
+                // Optional: Handle when contact ends
+            }
+
+            @Override
+            public void preSolve(Contact contact, Manifold oldManifold) {
+                // Optional: Modify contact behavior
+            }
+
+            @Override
+            public void postSolve(Contact contact, ContactImpulse impulse) {
+                // Optional: Handle post-collision effects
+            }
+        });
+    }
+
+    private void handleBirdHitsPig(Body pigBody) {
+        System.out.println("Bird hit pig!");
+
+        // Remove the pig body and its corresponding sprite
+        int pigIndex = bodies.indexOf(pigBody, true); // Find the index of the pig body
+        if (pigIndex != -1) {
+            bodiesToRemove.add(pigBody);          // Mark the pig body for removal
+            spritesToRemove.add(sprites.get(pigIndex)); // Mark the corresponding sprite for removal
+            pigBodies.removeValue(pigBody, true);  // Mark the pig body for removal
+        }
+
+    }
+
+    private boolean allPigsRemoved = false;
+    private boolean allBirdsRemoved = false;
+
+    private void removeBodies() {
+        // Remove bodies and their corresponding sprites in reverse order to avoid index issues
+        for (int i = bodiesToRemove.size() - 1; i >= 0; i--) {
+            Body body = bodiesToRemove.get(i);
+            int index = bodies.indexOf(body, true); // Find the index of the body
+            if (index != -1) {
+                world.destroyBody(body);           // Destroy the body in the world
+                bodies.removeIndex(index);        // Remove the body from the list
+                sprites.removeIndex(index);       // Remove the sprite from the list
+            }
+        }
+        bodiesToRemove.clear();
+        spritesToRemove.clear();
+
+        // Only call onAllPigsRemoved once when pigs are removed
+        if (!allPigsRemoved && pigBodies.isEmpty()) {
+            allPigsRemoved = true; // Set flag to true after calling the method
+            onAllPigsRemoved();    // Call a method to handle the event when all pigs are removed
+        }
+
+        // Only call onAllBirdsRemoved once when birds are removed
+        if (!allBirdsRemoved && birdBodies.isEmpty()) {
+            allBirdsRemoved = true; // Set flag to true after calling the method
+            // onAllBirdsRemoved();    // Call a method to handle the event when all birds are removed
+        }
+    }
+
+
+
+
+    private void onAllPigsRemoved() {
+        levels.unlockLevel("Level 2"); // Unlock Level 2
+        System.out.println("Level 2 has been unlocked!");
+
+        // Stop music if playing
+        if (pauseScreen.isMusicOn) {
+            pauseScreen.isMusicOn = false;
+            pauseScreen.backgroundMusic.pause();
+        }
+
+        // Show WinScreen
+        winScreen.show();
+    }
+
+
+
+
+
+//    private void handleBirdHitsPig(Body pigBody) {
+//        System.out.println("Bird hit pig!");
+//        bodiesToRemove.add(pigBody); // Mark the pig for removal
+//        for (int i = 0; i < bodies.size; i++) {
+//            if (bodies.get(i) == pigBody) {
+//                spritesToRemove.add(sprites.get(i));
+//                break;
+//            }
+//        }
+//    }
+//
+//    private void removeBodies() {
+//        for (Body body : bodiesToRemove) {
+//            world.destroyBody(body);
+//        }
+//        bodiesToRemove.clear();
+//        for (Sprite sprite : spritesToRemove) {
+//            sprites.removeValue(sprite, true);
+//        }
+//        spritesToRemove.clear();
+//    }
+
+
 
     @Override
     public void render(float delta) {
         ScreenUtils.clear(0.15f, 0.15f, 0.2f, 1f);
-
+        float timeScale = 2.0f; // Speed multiplier (2x faster)
+        float scaledDelta = delta * timeScale;
         // Step the physics simulation
-        world.step(1 / 60f, 6, 2);
+        world.step(scaledDelta, 10, 2);
+
+        removeBodies();
+
 
         batch.begin();
         batch.draw(background, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
@@ -252,6 +405,7 @@ public class Level1Screen extends ScreenAdapter {
         camera.position.set(camera.viewportWidth / 2f, camera.viewportHeight / 2f, 0);
         camera.update();
 //        debugRenderer.render(world, camera.combined);
+
 
     }
 

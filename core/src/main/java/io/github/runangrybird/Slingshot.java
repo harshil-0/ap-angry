@@ -14,6 +14,7 @@ public class Slingshot {
     private Body birdBody;  // Box2D body for the bird
     private float scale = 0.15f;  // Scaling factor for size reduction
 
+
     public Slingshot(World world, SpriteBatch batch, Texture slingshotTexture, Texture birdTexture, Vector2 position) {
         this.world = world;
         this.batch = batch;
@@ -37,11 +38,22 @@ public class Slingshot {
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.shape = shape;
         fixtureDef.density = 1f;
-        fixtureDef.friction = 0.5f;
-        fixtureDef.restitution = 0.3f;
+//        fixtureDef.friction = 0.5f;
+        fixtureDef.restitution = 0.5f;
 
-        birdBody.createFixture(fixtureDef);
+        Fixture f = birdBody.createFixture(fixtureDef);
+        f.setUserData("bird'");
+        birdBody.setUserData("bird");
         shape.dispose();
+
+
+//        Sprite sprite = new Sprite(birdTexture);
+//        sprite.setSize(birdTexture.getWidth() * scale, birdTexture.getHeight() * scale);
+//        sprite.setOriginCenter();
+
+//        Level1Screen.bodies.add(birdBody);
+//        Level1Screen.sprites.add(sprite);
+        Level1Screen.birdBodies.add(birdBody);
     }
 
     public void launchBird(Vector2 force) {
