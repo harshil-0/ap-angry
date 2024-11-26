@@ -145,9 +145,16 @@ public class Level1Screen extends ScreenAdapter {
             private Vector2 dragStart = new Vector2();
             private Vector2 dragEnd = new Vector2();
             private boolean isDragging = false;
+            private boolean birdLaunched = false; // Tracks if the bird has been launched
+            private int resetCount = 1;
 
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                if (birdLaunched) {
+                    // Prevent further dragging if bird is already launched
+                    System.out.println("Bird already launched!");
+                    return false;
+                }
                 dragStart.set(x, y);
                 isDragging = true;
                 return true;
@@ -155,24 +162,44 @@ public class Level1Screen extends ScreenAdapter {
 
             @Override
             public void touchDragged(InputEvent event, float x, float y, int pointer) {
-                dragEnd.set(x, y);
+                if (!birdLaunched) {
+                    dragEnd.set(x, y);
+                }
             }
 
             @Override
             public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
-                if (isDragging) {
+                if (isDragging && !birdLaunched) {
                     dragEnd.set(x, y);
                     Vector2 force = dragStart.sub(dragEnd).scl(100000000000000f);
-                    force.y += Math.abs(force.x) ;
-                    slingshot.launchBird(force);
+                    force.y += Math.abs(force.x); // Adjust force for a parabolic trajectory
+                    slingshot.launchBird(force); // Launch the bird with calculated force
                     isDragging = false;
+                    birdLaunched = true; // Set the flag to true after launching
+                    System.out.println("Bird launched!");
                 }
             }
 
             @Override
             public boolean keyDown(InputEvent event, int keycode) {
                 if (keycode == Input.Keys.R) {
-                    slingshot.resetBird(); // Reset bird on pressing 'R'
+                    if (birdLaunched && resetCount > 0) {
+                        slingshot.resetBird(); // Reset the bird
+                        resetCount--;          // Decrement the reset counter
+                        birdLaunched = false;  // Allow the bird to be launched again
+                        System.out.println("Bird reset! Remaining resets: " + resetCount);
+                    } else if (resetCount <= 0) {
+                        // Handle when no resets are left
+                        System.out.println("No resets remaining!");
+                        if (pauseScreen.isMusicOn) {
+                            pauseScreen.isMusicOn = false;
+                            pauseScreen.backgroundMusic.pause();
+                        }
+                        loseScreen.show();
+                    } else {
+                        // Handle case where bird has not yet been launched
+                        System.out.println("Cannot reset before launching!");
+                    }
                 }
                 return true;
             }
