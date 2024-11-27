@@ -66,10 +66,15 @@ public class NewGameScreen extends ScreenAdapter {
                     buttonStyle.imageUp = new TextureRegionDrawable(new TextureRegion(levelImage1));
                     break;
                 case "Level 2":
-                    buttonStyle.imageUp = new TextureRegionDrawable(new TextureRegion(isLocked ? levelImage2gr : levelImage2)); // Check lock status here
+                    if (!isLocked) {
+                        buttonStyle.imageUp = new TextureRegionDrawable(new TextureRegion(levelImage2)); // Check lock status here
+                    }
+                    else{
+                        buttonStyle.imageUp = new TextureRegionDrawable(new TextureRegion(levelImage2));
+                    }
                     break;
                 case "Level 3":
-                    buttonStyle.imageUp = new TextureRegionDrawable(new TextureRegion(isLocked ? levelImage3gr : levelImage3)); // Check lock status here
+                    buttonStyle.imageUp = new TextureRegionDrawable(new TextureRegion(isLocked ? levelImage3 : levelImage3)); // Check lock status here
                     break;
             }
 
@@ -82,24 +87,22 @@ public class NewGameScreen extends ScreenAdapter {
                 @Override
                 public void clicked(InputEvent event, float x, float y) {
                     System.out.println("Selected level: " + level);
-                    if (!isLocked) {
+
                         switch (level) {
                             case "Level 1":
                                 ((Game) Gdx.app.getApplicationListener()).setScreen(new Level1Screen(levels));
                                 break;
                             case "Level 2":
-                                ((Game) Gdx.app.getApplicationListener()).setScreen(new Level2Screen());
+                                ((Game) Gdx.app.getApplicationListener()).setScreen(new Level2Screen(levels));
                                 break;
                             case "Level 3":
-                                ((Game) Gdx.app.getApplicationListener()).setScreen(new Level3Screen());
+                                ((Game) Gdx.app.getApplicationListener()).setScreen(new Level3Screen(levels));
                                 break;
                             default:
                                 System.err.println("[Error] No screen defined for this level");
                                 break;
                         }
-                    } else {
-                        System.err.println("[Info] Level is locked.");
-                    }
+
                 }
             });
 
@@ -122,6 +125,66 @@ public class NewGameScreen extends ScreenAdapter {
         });
         stage.addActor(backButtonImageWidget);
     }
+//    public void refreshLevelButtons(Stage stage) {
+//        stage.clear(); // Remove all existing actors
+//        float buttonWidth = 220f;
+//        float buttonHeight = 216f;
+//
+//        int i = 0;
+//        for (Map.Entry<String, Boolean> entry : levels.getLevelList().entrySet()) {
+//            String level = entry.getKey();
+//            boolean isLocked = entry.getValue();
+//
+//            ImageButton.ImageButtonStyle buttonStyle = new ImageButton.ImageButtonStyle();
+//
+//            // Assign appropriate image
+//            switch (level) {
+//                case "Level 1":
+//                    buttonStyle.imageUp = new TextureRegionDrawable(new TextureRegion(levelImage1));
+//                    break;
+//                case "Level 2":
+//                    buttonStyle.imageUp = new TextureRegionDrawable(new TextureRegion(isLocked ? levelImage2gr : levelImage2));
+//                    break;
+//                case "Level 3":
+//                    buttonStyle.imageUp = new TextureRegionDrawable(new TextureRegion(isLocked ? levelImage3gr : levelImage3));
+//                    break;
+//            }
+//
+//            ImageButton levelButton = new ImageButton(buttonStyle);
+//            levelButton.setSize(buttonWidth, buttonHeight);
+//            levelButton.setPosition(200 + (i * (buttonWidth + 50)), Gdx.graphics.getHeight() / 2);
+//            i++;
+//
+//            levelButton.addListener(new ClickListener() {
+//                @Override
+//                public void clicked(InputEvent event, float x, float y) {
+//                    if (isLocked) {
+//                        System.out.println("[Info] " + level + " is locked.");
+//                        return;
+//                    }
+//
+//                    System.out.println("Selected level: " + level);
+//                    switch (level) {
+//                        case "Level 1":
+//                            ((Game) Gdx.app.getApplicationListener()).setScreen(new Level1Screen(levels));
+//                            break;
+//                        case "Level 2":
+//                            ((Game) Gdx.app.getApplicationListener()).setScreen(new Level2Screen());
+//                            break;
+//                        case "Level 3":
+//                            ((Game) Gdx.app.getApplicationListener()).setScreen(new Level3Screen());
+//                            break;
+//                        default:
+//                            System.err.println("[Error] No screen defined for this level");
+//                            break;
+//                    }
+//                }
+//            });
+//
+//            stage.addActor(levelButton); // Add button to stage
+//        }
+//    }
+
 
 
     @Override

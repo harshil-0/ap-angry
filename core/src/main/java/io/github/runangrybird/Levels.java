@@ -18,12 +18,13 @@ public class Levels {
     }
     public void unlockLevel(String level) {
         if (levelList.containsKey(level)) {
-            if (levelList.get(level)) { // If the level is locked
+//            if (levelList.get(level)) { // If the level is locked
                 levelList.put(level, false); // Unlock the level by setting to false
                 System.out.println("[Info] " + level + " has been unlocked.");
-            } else {
-                System.out.println("[Info] " + level + " is already unlocked.");
-            }
+                System.out.println(levelList.toString());
+//            } else {
+//                System.out.println("[Info] " + level + " is already unlocked.");
+//            }
         } else {
             System.err.println("[Error] Level not found: " + level);
         }

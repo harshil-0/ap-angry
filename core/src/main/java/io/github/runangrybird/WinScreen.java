@@ -20,12 +20,14 @@ public class WinScreen {
     private Stage stage;
     private Skin skin;
     private Dialog winDialog;
-    private Levels levels;  // Shared Levels instance
+    private Levels levels;
+    private String levelName;
 
-    public WinScreen(Levels levels, Stage stage, Skin skin) {
+    public WinScreen(Levels levels, Stage stage, Skin skin, String levelName) {
         this.levels = levels;
         this.stage = stage;
         this.skin = skin;
+        this.levelName = levelName;
 
         createWinDialog();
     }
@@ -77,8 +79,16 @@ public class WinScreen {
         restartButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
+                if (levelName.equals("Level 1")){
                 ((Game) Gdx.app.getApplicationListener()).setScreen(new Level1Screen(levels));
-                winDialog.hide();
+                winDialog.hide();}
+                else if (levelName.equals("Level 2")){
+                ((Game) Gdx.app.getApplicationListener()).setScreen(new Level2Screen(levels));
+                winDialog.hide();}
+                else{
+//                    ((Game) Gdx.app.getApplicationListener()).setScreen(new Level3Screen(levels));
+                    winDialog.hide();
+                }
             }
         });
         table.add(restartButton).padBottom(20).fillX().height(60).row();

@@ -41,18 +41,22 @@ public class Level1Screen extends ScreenAdapter {
     private List<Sprite> spritesToRemove = new ArrayList<>();
     private Array<Body> pigBodies = new Array<>();
     public static Array<Body> birdBodies = new Array<>();
+//    private NewGameScreen newGameScreen;
 
 
     private Texture birdTexture, pigTexture, woodTexture;
 
     public Level1Screen(Levels levels) {
-        this.levels = levels;  // Initialize with the shared Levels instance
+        this.levels = levels;// Initialize with the shared Levels instance
+//        this.newGameScreen = newGameScreen;
+
     }
 
     @Override
     public void show() {
         batch = new SpriteBatch();
         background = new Texture(Gdx.files.internal("level1bg.jpg"));
+//        NewGameScreen newGameScreen = new NewGameScreen(levels);
 
         // Initialize Box2D world with gravity
         world = new World(new Vector2(0, -10f), true);  // Gravity pointing downward
@@ -107,6 +111,7 @@ public class Level1Screen extends ScreenAdapter {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 levels.unlockLevel("Level 2"); // Unlock Level 2
+//                newGameScreen.refreshLevelButtons(stage);
                 System.out.println("Level 2 has been unlocked!");
 //                ((Game) Gdx.app.getApplicationListener()).setScreen(new WinScreen(levels,stage,skin));  // Pass levels object
                 if (pauseScreen.isMusicOn) {
@@ -136,9 +141,9 @@ public class Level1Screen extends ScreenAdapter {
         });
         stage.addActor(LoseButton);
 
-        pauseScreen = new PauseScreen(stage, skin);
-        winScreen = new WinScreen(levels, stage, skin);
-        loseScreen = new LoseScreen(levels, stage, skin);
+        pauseScreen = new PauseScreen(stage, skin,"Level 1");
+        winScreen = new WinScreen(levels, stage, skin,"Level 1");
+        loseScreen = new LoseScreen(levels, stage, skin,"Level 1");
         setupCollisionDetection();
 
         stage.addListener(new InputListener() {
@@ -172,7 +177,7 @@ public class Level1Screen extends ScreenAdapter {
                 if (isDragging && !birdLaunched) {
                     dragEnd.set(x, y);
                     Vector2 force = dragStart.sub(dragEnd).scl(100000000000000f);
-                    force.y += Math.abs(force.x); // Adjust force for a parabolic trajectory
+//                    force.y += Math.abs(force.x); // Adjust force for a parabolic trajectory
                     slingshot.launchBird(force); // Launch the bird with calculated force
                     isDragging = false;
                     birdLaunched = true; // Set the flag to true after launching

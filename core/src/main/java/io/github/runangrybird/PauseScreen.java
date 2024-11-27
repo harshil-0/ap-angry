@@ -164,14 +164,16 @@ public class PauseScreen {
     private Levels levels;  // Shared Levels object
     public Music backgroundMusic;  // For controlling the music
     public boolean isMusicOn = true;
+    private String levelName;
 
     public PauseScreen(Levels levels) {
         this.levels = levels;  // Initialize with the shared Levels instance
     }
 
-    public PauseScreen(Stage stage, Skin skin) {
+    public PauseScreen(Stage stage, Skin skin,String levelName) {
         this.stage = stage;
         this.skin = skin;
+        this.levelName = levelName;
         // Load the music file here (using a hardcoded path for now)
         try {
             this.backgroundMusic = Gdx.audio.newMusic(Gdx.files.internal("audio_episode_intro.mp3"));
@@ -218,8 +220,16 @@ public class PauseScreen {
         restartButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                // Restart the current level
-                ((Game) Gdx.app.getApplicationListener()).setScreen(new Level1Screen(levels));
+                if (levelName.equals("Level 1")){
+                    ((Game) Gdx.app.getApplicationListener()).setScreen(new Level1Screen(levels));
+                    pauseDialog.hide();}
+                else if (levelName.equals("Level 2")){
+                    ((Game) Gdx.app.getApplicationListener()).setScreen(new Level2Screen(levels));
+                    pauseDialog.hide();}
+                else{
+//                    ((Game) Gdx.app.getApplicationListener()).setScreen(new Level3Screen(levels));
+                    pauseDialog.hide();
+                }
             }
         });
         table.add(restartButton).padBottom(20).fillX().height(60).row();

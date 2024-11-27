@@ -19,12 +19,14 @@ public class LoseScreen {
     private Stage stage;
     private Skin skin;
     private Dialog loseDialog;
-    private Levels levels;  // Shared Levels instance
+    private Levels levels;
+    private String levelName;// Shared Levels instance
 
-    public LoseScreen(Levels levels, Stage stage, Skin skin) {
+    public LoseScreen(Levels levels, Stage stage, Skin skin, String levelName) {
         this.levels = levels;
         this.stage = stage;
         this.skin = skin;
+        this.levelName = levelName;
 
         createLoseDialog();
     }
@@ -61,8 +63,16 @@ public class LoseScreen {
         retryButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                ((Game) Gdx.app.getApplicationListener()).setScreen(new Level1Screen(levels));
-                loseDialog.hide();
+                if (levelName.equals("Level 1")){
+                    ((Game) Gdx.app.getApplicationListener()).setScreen(new Level1Screen(levels));
+                    loseDialog.hide();}
+                else if (levelName.equals("Level 2")){
+                    ((Game) Gdx.app.getApplicationListener()).setScreen(new Level2Screen(levels));
+                    loseDialog.hide();}
+                else{
+//                    ((Game) Gdx.app.getApplicationListener()).setScreen(new Level3Screen(levels));
+                    loseDialog.hide();
+                }
             }
         });
         table.add(retryButton).padBottom(20).fillX().height(60).row();
