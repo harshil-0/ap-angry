@@ -48,7 +48,7 @@ public class NewGameScreen extends ScreenAdapter {
         levelImage2gr = new Texture(Gdx.files.internal("2lvlgr.PNG"));
         levelImage3gr = new Texture(Gdx.files.internal("level3gr.PNG"));
 
-        Levels levels = new Levels();  // Retrieve level status from Levels
+        levels = new Levels();  // Retrieve level status from Levels
         levelList = levels.getLevelList();
 
         float buttonWidth = 220f;

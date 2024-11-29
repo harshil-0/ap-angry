@@ -41,6 +41,8 @@ public class Level2Screen extends ScreenAdapter {
     private List<Sprite> spritesToRemove = new ArrayList<>();
     private Array<Body> pigBodies = new Array<>();
     public static Array<Body> birdBodies = new Array<>();
+    private Array<Wood> woodList= new Array<>();
+    private Array<Pig> pigList= new Array<>();
 //    private NewGameScreen newGameScreen;
 
 
@@ -66,9 +68,12 @@ public class Level2Screen extends ScreenAdapter {
         Gdx.input.setInputProcessor(stage);  // Set input processor to handle button clicks
         skin = new Skin(Gdx.files.internal("uiskin.json"));  // Assuming a default skin
 
-        Texture slingshotTexture = new Texture(Gdx.files.internal("slingshot.png"));
         birdTexture = new Texture(Gdx.files.internal("ab3.png"));
-        slingshot = new Slingshot(world, batch, slingshotTexture, birdTexture, new Vector2(200, 210));
+        Bird bird = new Bird("bird", birdTexture, 500, 260);
+
+        Texture slingshotTexture = new Texture(Gdx.files.internal("slingshot.png"));
+        slingshot = new Slingshot(world, batch, slingshotTexture, bird, new Vector2(500, 210));
+
         // Load textures
 //        birdTexture = new Texture(Gdx.files.internal("ab3.png"));
         pigTexture = new Texture(Gdx.files.internal("pig1.png"));
@@ -84,14 +89,33 @@ public class Level2Screen extends ScreenAdapter {
 //        createDynamicBody(150, 300, birdTexture, 0.2f);
 
         // Create pigs
-        createDynamicBody(1150, 400, pigTexture, 0.2f,"pig");
-//        createDynamicBody(1300, 400, pigTexture, 0.2f,"pig");
+//        createDynamicBody(1150, 400, pigTexture, 0.2f,"pig");
+////        createDynamicBody(1300, 400, pigTexture, 0.2f,"pig");
+//
+//        // Create woods
+//        createDynamicBody(1000, 300, woodTexture, 1f,"wood");
+//        createDynamicBody(1300, 300, woodTexture, 1f,"wood");
+//        createDynamicBody(1000, 400, woodTexture, 1f,"wood");
+//        createDynamicBody(1300, 400, woodTexture, 1f,"wood");
 
-        // Create woods
-        createDynamicBody(1000, 300, woodTexture, 1f,"wood");
-        createDynamicBody(1300, 300, woodTexture, 1f,"wood");
-        createDynamicBody(1000, 400, woodTexture, 1f,"wood");
-        createDynamicBody(1300, 400, woodTexture, 1f,"wood");
+        woodList.add(new Wood(world, 1000, 300, woodTexture, 1f,"wood"));
+        woodList.add(new Wood(world, 1300, 300, woodTexture, 1f,"wood"));
+        woodList.add(new Wood(world, 1000, 400, woodTexture, 1f,"wood"));
+        woodList.add(new Wood(world, 1300, 400, woodTexture, 1f,"wood"));
+        Pig p1 = new Pig(world, 1150, 400, pigTexture, 0.2f,"pig");
+//        Pig p2 = new Pig(world, 1300, 400, pigTexture, 0.2f,"pig");
+        pigList.add(p1);
+//        pigList.add(p2);
+
+        for (Wood wood : woodList) {
+            sprites.add(wood.getSprite());
+            bodies.add(wood.getBody());
+        }
+        for (Pig pig : pigList) {
+            sprites.add(pig.getSprite());
+            bodies.add(pig.getBody());
+            pigBodies.add(pig.getBody());
+        }
 
 //         Load the pause button texture and create the button
         Texture pauseTexture = new Texture(Gdx.files.internal("pause.png"));
@@ -238,40 +262,40 @@ public class Level2Screen extends ScreenAdapter {
         groundShape.dispose();
     }
 
-    private void createDynamicBody(float x, float y, Texture texture, float scale, String userData) {
-        // Define a dynamic body
-        BodyDef bodyDef = new BodyDef();
-        bodyDef.type = BodyDef.BodyType.DynamicBody;
-        bodyDef.position.set(x, y);
-
-        Body body = world.createBody(bodyDef);
-
-        // Define a box shape
-        PolygonShape shape = new PolygonShape();
-        shape.setAsBox(texture.getWidth() * scale / 2, texture.getHeight() * scale / 2);
-
-        // Create a fixture
-        FixtureDef fixtureDef = new FixtureDef();
-        fixtureDef.shape = shape;
-        fixtureDef.density = 1f;
-        fixtureDef.friction = 0.5f;
-        fixtureDef.restitution = 0.3f;
-
-        Fixture fixture = body.createFixture(fixtureDef);
-        fixture.setUserData(userData); // Set user data (e.g., "bird" or "pig")
-        body.setUserData(userData);
-        shape.dispose();
-
-        // Add sprite
-        Sprite sprite = new Sprite(texture);
-        sprite.setSize(texture.getWidth() * scale, texture.getHeight() * scale);
-        sprite.setOriginCenter();
-        sprites.add(sprite);
-        bodies.add(body);
-        if (body.getUserData().equals("pig")){
-            pigBodies.add(body);
-        }
-    }
+//    private void createDynamicBody(float x, float y, Texture texture, float scale, String userData) {
+//        // Define a dynamic body
+//        BodyDef bodyDef = new BodyDef();
+//        bodyDef.type = BodyDef.BodyType.DynamicBody;
+//        bodyDef.position.set(x, y);
+//
+//        Body body = world.createBody(bodyDef);
+//
+//        // Define a box shape
+//        PolygonShape shape = new PolygonShape();
+//        shape.setAsBox(texture.getWidth() * scale / 2, texture.getHeight() * scale / 2);
+//
+//        // Create a fixture
+//        FixtureDef fixtureDef = new FixtureDef();
+//        fixtureDef.shape = shape;
+//        fixtureDef.density = 1f;
+//        fixtureDef.friction = 0.5f;
+//        fixtureDef.restitution = 0.3f;
+//
+//        Fixture fixture = body.createFixture(fixtureDef);
+//        fixture.setUserData(userData); // Set user data (e.g., "bird" or "pig")
+//        body.setUserData(userData);
+//        shape.dispose();
+//
+//        // Add sprite
+//        Sprite sprite = new Sprite(texture);
+//        sprite.setSize(texture.getWidth() * scale, texture.getHeight() * scale);
+//        sprite.setOriginCenter();
+//        sprites.add(sprite);
+//        bodies.add(body);
+//        if (body.getUserData().equals("pig")){
+//            pigBodies.add(body);
+//        }
+//    }
 
 
     private void setupCollisionDetection() {

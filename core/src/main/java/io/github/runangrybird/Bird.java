@@ -1,55 +1,64 @@
 package io.github.runangrybird;
 
-public abstract class Bird {
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.*;
+
+public class Bird {
     private String type;
-    private float velocity;
-    private float position;
-    private float angle;
+    private Texture texture;
+    private float x, y;
+    private Body birdBody;
 
-    public Bird(String type, float velocity, float position, float angle) {
+    public Bird(String type, Texture texture, float x, float y) {
         this.type = type;
-        this.velocity = velocity;
-        this.position = position;
-        this.angle = angle;
+        this.texture = texture;
+        this.x = x;
+        this.y = y;
     }
 
-    public void launch() {
-        System.out.println(type + " bird launched at velocity " + velocity + " and angle " + angle);
+    public void createDynamicBody(World world, float scale) {
+        // Define body properties
+        BodyDef bodyDef = new BodyDef();
+        bodyDef.type = BodyDef.BodyType.DynamicBody;
+        bodyDef.position.set(x, y);
+
+        birdBody = world.createBody(bodyDef);
+
+        // Define shape
+        CircleShape shape = new CircleShape();
+        shape.setRadius(texture.getWidth() * scale / 2);
+
+        // Define fixture
+        FixtureDef fixtureDef = new FixtureDef();
+        fixtureDef.shape = shape;
+        fixtureDef.density = 1f;
+        fixtureDef.restitution = 0.5f;
+
+        Fixture fixture = birdBody.createFixture(fixtureDef);
+        fixture.setUserData("bird");  // Use the bird's type as user data
+
+        birdBody.setUserData("bird");
+        shape.dispose();
     }
 
-    public void adjustAngle(float angle) {
-        this.angle = angle;
-        System.out.println(type + " bird angle adjusted to " + angle);
+    public Body getBirdBody() {
+        return birdBody;
     }
 
-    public void adjustVelocity(float velocity) {
-        this.velocity = velocity;
-        System.out.println(type + " bird velocity adjusted to " + velocity);
+    public Texture getTexture() {
+        return texture;
     }
 
-    public float getVelocity() {
-        return velocity;
+    public Vector2 getPosition() {
+        return new Vector2(x, y);
     }
 
-    public void setVelocity(float velocity) {
-        this.velocity = velocity;
+    public void resetPosition(float newX, float newY) {
+        this.x = newX;
+        this.y = newY;
+        birdBody.setTransform(newX, newY, 0);
+        birdBody.setLinearVelocity(0, 0);
+        birdBody.setAngularVelocity(0);
     }
-
-    public float getPosition() {
-        return position;
-    }
-
-    public void setPosition(float position) {
-        this.position = position;
-    }
-
-    public float getAngle() {
-        return angle;
-    }
-
-    public void setAngle(float angle) {
-        this.angle = angle;
-    }
-
-    public abstract void specialAbility();
 }

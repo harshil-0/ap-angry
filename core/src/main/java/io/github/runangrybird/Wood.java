@@ -5,7 +5,7 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 
-public class Pig {
+public class Wood {
     private String type;
     private Body body;
     private Texture texture;
@@ -13,7 +13,7 @@ public class Pig {
     private float x, y;
     private Sprite sprite; // Added Sprite field
 
-    public Pig(World world, float x, float y, Texture texture, float scale, String type) {
+    public Wood(World world, float x, float y, Texture texture, float scale, String type) {
         this.texture = texture;
         this.scale = scale;
         this.x = x;
@@ -21,7 +21,6 @@ public class Pig {
         this.type = type;
 
         createDynamicBody(world);
-
     }
 
     private void createDynamicBody(World world) {
@@ -33,18 +32,18 @@ public class Pig {
         body = world.createBody(bodyDef);
 
         // Define shape
-        CircleShape shape = new CircleShape();
-        shape.setRadius(texture.getWidth() * scale / 2);
+        PolygonShape shape = new PolygonShape();
+        shape.setAsBox(texture.getWidth() * scale / 2, texture.getHeight() * scale / 2);
 
         // Define fixture
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.shape = shape;
-        fixtureDef.density = 0.5f; // Lower density for pig
+        fixtureDef.density = 1.0f; // Higher density for wood
         fixtureDef.friction = 0.5f;
-        fixtureDef.restitution = 0.7f; // Higher restitution for bounciness
+        fixtureDef.restitution = 0.5f; // Moderate restitution for wood
 
-        body.createFixture(fixtureDef).setUserData("pig");
-        body.setUserData("pig");
+        body.createFixture(fixtureDef).setUserData("wood");
+        body.setUserData("wood");
 
         shape.dispose();
         createSprite(); // Initialize sprite
@@ -73,4 +72,3 @@ public class Pig {
         return sprite;
     }
 }
-
