@@ -1,6 +1,7 @@
 package io.github.runangrybird;
 
 import com.badlogic.gdx.Game;
+import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.ScreenAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
@@ -45,6 +46,45 @@ public class MenuScreen extends ScreenAdapter {
                     // Handle exceptions and print error message
                     Gdx.app.log("Error", "An error occurred while transitioning to NewGameScreen: " + e.getMessage());
                     e.printStackTrace();  // Optional: Print the stack trace for debugging
+                }
+            }
+        });
+
+        continueGameButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                try {
+                    // Load saved game data
+                    SaveGameManager.SaveData saveData = SaveGameManager.loadGame(world, pigTexture, woodTexture, pigList, woodList);
+
+                    if (saveData == null) {
+                        Gdx.app.log("Continue Button", "No saved game found. Starting a new game.");
+                        return;
+                    }
+
+                    // Determine the appropriate screen based on the saved level
+                    Screen nextScreen;
+                    switch (saveData.currentLevel) {
+                        case "Level 1":
+                            nextScreen = new Level1Screen(saveData.birdResetCount, Level1Screen.pigList, Level1Screen.woodList);
+                            break;
+                        case "Level 2":
+                            nextScreen = new Level2Screen(saveData.birdResetCount, Level2Screen.pigList, Level2Screen.woodList);
+                            break;
+                        case "Level 3":
+                            nextScreen = new Level3Screen(saveData.birdResetCount, Level3Screen.pigList, Level3Screen.woodList);
+                            break;
+                        default:
+                            Gdx.app.log("Continue Button", "Unknown level: " + saveData.currentLevel);
+                            return;
+                    }
+
+                    // Transition to the selected screen
+                    ((Game) Gdx.app.getApplicationListener()).setScreen(nextScreen);
+                } catch (Exception e) {
+                    // Handle exceptions and print error message
+                    Gdx.app.log("Error", "An error occurred while loading the saved game: " + e.getMessage());
+                    e.printStackTrace(); // Optional: Print the stack trace for debugging
                 }
             }
         });

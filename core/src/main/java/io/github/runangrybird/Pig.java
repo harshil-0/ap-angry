@@ -13,6 +13,8 @@ public class Pig {
     private float x, y;
     private Sprite sprite; // Added Sprite field
 
+    public Pig() {}
+
     public Pig(World world, float x, float y, Texture texture, float scale, String type) {
         this.texture = texture;
         this.scale = scale;
@@ -65,6 +67,22 @@ public class Pig {
         return texture;
     }
 
+    public String getType() {
+        return type;
+    }
+
+    public float getScale() {
+        return scale;
+    }
+
+    public float getX() {
+        return x;
+    }
+
+    public float getY() {
+        return y;
+    }
+
     public Vector2 getPosition() {
         return new Vector2(x, y);
     }
@@ -72,5 +90,15 @@ public class Pig {
     public Sprite getSprite() { // Getter for Sprite
         return sprite;
     }
+
+    public SaveGameManager.PigD toData() {
+        SaveGameManager.PigD data = new SaveGameManager.PigD();
+        data.type = this.type;
+        data.x = this.x;
+        data.y = this.y;
+        data.scale = this.scale;
+        return data;
+    }
+
 }
 

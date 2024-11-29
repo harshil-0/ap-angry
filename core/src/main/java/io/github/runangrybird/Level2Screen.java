@@ -41,8 +41,8 @@ public class Level2Screen extends ScreenAdapter {
     private List<Sprite> spritesToRemove = new ArrayList<>();
     private Array<Body> pigBodies = new Array<>();
     public static Array<Body> birdBodies = new Array<>();
-    private Array<Wood> woodList= new Array<>();
-    private Array<Pig> pigList= new Array<>();
+    public static Array<Wood> woodList= new Array<>();
+    public static Array<Pig> pigList= new Array<>();
 //    private NewGameScreen newGameScreen;
 
 

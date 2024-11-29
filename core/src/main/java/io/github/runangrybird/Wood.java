@@ -13,6 +13,8 @@ public class Wood {
     private float x, y;
     private Sprite sprite; // Added Sprite field
 
+    public Wood() {}
+
     public Wood(World world, float x, float y, Texture texture, float scale, String type) {
         this.texture = texture;
         this.scale = scale;
@@ -71,4 +73,14 @@ public class Wood {
     public Sprite getSprite() { // Getter for Sprite
         return sprite;
     }
+
+    public SaveGameManager.WoodD toData() {
+        SaveGameManager.WoodD data = new SaveGameManager.WoodD();
+        data.type = this.type;
+        data.x = this.x;
+        data.y = this.y;
+        data.scale = this.scale;
+        return data;
+    }
+
 }

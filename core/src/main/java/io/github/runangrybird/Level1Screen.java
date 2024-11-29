@@ -15,6 +15,7 @@ import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Array;
@@ -41,8 +42,10 @@ public class Level1Screen extends ScreenAdapter {
     private List<Sprite> spritesToRemove = new ArrayList<>();
     private Array<Body> pigBodies = new Array<>();
     public static Array<Body> birdBodies = new Array<>();
-    private Array<Wood> woodList= new Array<>();
-    private Array<Pig> pigList= new Array<>();
+    public static Array<Wood> woodList= new Array<>();
+    public static Array<Pig> pigList= new Array<>();
+    public static int resetCount = 1;
+    public String currentLevel = "Level 1";
 //    private NewGameScreen newGameScreen;
 
 
@@ -162,6 +165,26 @@ public class Level1Screen extends ScreenAdapter {
         });
         stage.addActor(LoseButton);
 
+
+        TextButton saveButton = new TextButton("Save Game", skin);
+
+        // Set button size and position
+        saveButton.setSize(200, 60);
+        saveButton.setPosition(Gdx.graphics.getWidth() / 2f - 100, Gdx.graphics.getHeight() / 2f);
+
+        // Add ClickListener to handle the save action
+        saveButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                // Call your save game logic here
+                SaveGameManager.saveGame(resetCount, currentLevel, (List<Pig>) pigList, (List<Wood>) woodList);
+                Gdx.app.log("Save Button", "Game state saved!");
+            }
+        });
+
+        // Add the button to the stage
+        stage.addActor(saveButton);
+
         pauseScreen = new PauseScreen(stage, skin,"Level 1");
         winScreen = new WinScreen(levels, stage, skin,"Level 1");
         loseScreen = new LoseScreen(levels, stage, skin,"Level 1");
@@ -172,7 +195,7 @@ public class Level1Screen extends ScreenAdapter {
             private Vector2 dragEnd = new Vector2();
             private boolean isDragging = false;
             private boolean birdLaunched = false; // Tracks if the bird has been launched
-            private int resetCount = 1;
+//            public int resetCount = 1;
 
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
@@ -344,7 +367,15 @@ public class Level1Screen extends ScreenAdapter {
         if (pigIndex != -1) {
             bodiesToRemove.add(pigBody);          // Mark the pig body for removal
             spritesToRemove.add(sprites.get(pigIndex)); // Mark the corresponding sprite for removal
-            pigBodies.removeValue(pigBody, true);  // Mark the pig body for removal
+            pigBodies.removeValue(pigBody, true);
+            System.out.println(pigList);
+            for (Pig pig : pigList) {
+                if (pig.getBody().equals(pigBody)) { // Assuming Pig class has a getBody() method
+                    pigList.removeValue(pig, true);  // Remove the Pig object from pigList
+                    break;                           // Break after finding and removing the Pig
+                }
+            }// Mark the pig body for removal
+            System.out.println(pigList);
         }
 
     }
